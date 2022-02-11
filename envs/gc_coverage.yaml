@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+  - anaconda
+dependencies:
+  - datamash==1.1.0
+  - bedtools==2.27.1

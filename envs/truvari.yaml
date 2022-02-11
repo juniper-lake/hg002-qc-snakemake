@@ -1,0 +1,13 @@
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - truvari
+  - intervaltree==2.1.0
+  - pyvcf
+  - python-Levenshtein
+  - progressbar2
+  - pysam
+  - pyfaidx
+  

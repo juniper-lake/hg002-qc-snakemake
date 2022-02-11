@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+  - anaconda
+dependencies:
+  - python=3
+  - bedtools==2.27.1
