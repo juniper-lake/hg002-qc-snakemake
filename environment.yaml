@@ -1,0 +1,10 @@
+name: pb-human-wgs-workflow
+channels:
+- bioconda
+- conda-forge
+- defaults
+dependencies:
+- snakemake>=6.15
+- lockfile==0.12.2
+- mamba
+- python=3
