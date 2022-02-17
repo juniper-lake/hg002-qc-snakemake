@@ -70,7 +70,7 @@ targets = [f"conditions/{condition}/{filename}"
   - TP-base `jq .TP-base <filename>`
 - `pbsv/all_chroms.pbsv.vcf.gz`
   - counts of each type of variant `bcftools query -i 'FILTER=="PASS"' -f '%INFO/SVTYPE\n' <filename> | awk '{A[$1]++}END{for(i in A)print i,A[i]}'`
-  - can also do size distributions of indels ` bcftools query -i 'FILTER=="PASS" && (INFO/SVTYPE=="INS" | INFO/SVTYPE=="DEL")' -f '%INFO/SVTYPE\t%INFO/SVLEN\n' <filename>`
+  - can also do size distributions of indels `bcftools query -i 'FILTER=="PASS" && (INFO/SVTYPE=="INS" | INFO/SVTYPE=="DEL")' -f '%INFO/SVTYPE\t%INFO/SVLEN\n' <filename>`
 - `deepvariant/deepvariant.vcf.stats.txt`
   - several values in lines starting with 'SN' `awk '$1=="SN"' <filename>`
     - number of SNPS
@@ -98,7 +98,12 @@ targets = [f"conditions/{condition}/{filename}"
     - INDEL precision `awk -F, '$1=="INDEL" && $2=="PASS" {print $11}' <filename>`
     - INDEL F1 `awk -F, '$1=="INDEL" && $2=="PASS" {print $13}' <filename>`
 - `happy/all.extended.csv` + `happy/cmrg.extended.csv`
-  - there are many stratifications that can be examined, and Aaron Wenger might have opinionso n which are most important. The below commands are just for one stratification "GRCh38_lowmappabilityall.bed.gz".
+  - The following commands are just for one stratification "GRCh38_lowmappabilityall.bed.gz". Important stratifications include:
+    - GRCh38_lowmappabilityall.bed.gz
+    - GRCh38_nonunique_l250_m0_e0.bed.gz
+    - GRCh38_segdups_gt10kb.bed.gz
+    - GRCh38_SimpleRepeat_homopolymer_gt11_slop5.bed.gz
+    - GRCh38_AllTandemRepeats_gt100bp_slop5.bed.gz
   - SNP GRCh38_lowmappabilityall recall `awk -F, '$1=="SNP" && $2=="*" && $3=="GRCh38_lowmappabilityall.bed.gz" && $4=="PASS" {print $8}' <filename>`
   - SNP GRCh38_lowmappabilityall precision `awk -F, '$1=="SNP" && $2=="*" && $3=="GRCh38_lowmappabilityall.bed.gz" && $4=="PASS" {print $9}' <filename>`
   - SNP GRCh38_lowmappabilityall F1 `awk -F, '$1=="SNP" && $2=="*" && $3=="GRCh38_lowmappabilityall.bed.gz" && $4=="PASS" {print $11}' <filename>` 
