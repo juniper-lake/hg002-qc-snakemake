@@ -46,7 +46,8 @@ targets = [f"conditions/{condition}/{filename}"
                                     "mosdepth/coverage.mosdepth.summary.txt",
                                     "mosdepth/mosdepth.M2_ratio.txt",
                                     "mosdepth/gc_coverage.summary.txt",
-                                    "mosdepth/coverage.thresholds.summary.txt"]]
+                                    "mosdepth/coverage.thresholds.summary.txt",
+                                    "whatshap/phase.eval.tsv"]]
 ```
 
 - `smrtcell_stats/all_movies.read_length_and_quality.tsv`
@@ -123,3 +124,10 @@ targets = [f"conditions/{condition}/{filename}"
 - `mosdepth/coverage.thresholds.summary.txt`
   - outputs 10 columns corresponding to % of genome sequenced to minimum coverage depths (1X - 10X)
   - maybe a line chart comparing the different coverage thresholds among conditions
+- `whatshap/phase.eval.tsv`
+  - each row is a different chromosome
+  - important values for each chromosome might include columns:
+    - 9  all_assessed_pairs (sample size for error rates)
+    - 11  all_switch_rate
+    - 13  all_switchflip_rate
+    - 15  blockwise_hamming_rate

@@ -17,6 +17,7 @@ happy = { 'all' : { 'bed' : 'resources/HG002_GRCh38_1_22_v4.2.1_benchmark_noinco
                       'vcf' : 'resources/HG002_GRCh38_CMRG_smallvar_v1.00.vcf.gz'}}
 stratifications = 'resources/stratifications/v2.0-GRCh38-stratifications.tsv'
 sdf = 'resources/human_GRCh38_no_alt_analysis_set.sdf'
+whatshap_bench_vcf = 'resources/NA24385.GRCh38.phased_variants.vcf.gz'
 all_chroms = ['chr'+ s for s in list(map(str,*[range(1,23)]))] + ['chrX','chrY','chrM']
 deepvariant_version = '1.2.0-gpu'  # GPU
 n_shards = 256
@@ -58,11 +59,8 @@ targets = [f"conditions/{condition}/{filename}"
                                     "mosdepth/coverage.mosdepth.summary.txt",
                                     "mosdepth/mosdepth.M2_ratio.txt",
                                     "mosdepth/gc_coverage.summary.txt",
-                                    "mosdepth/coverage.thresholds.summary.txt"]]
-
-# targets = [f"conditions/{condition}/{filename}"
-#                     for condition in ubam_dict.keys()
-#                     for filename in ["truvari/truvari.summary.txt"]]
+                                    "mosdepth/coverage.thresholds.summary.txt",
+                                    "whatshap/phase.eval.tsv"]]
 
 
 rule all:
@@ -707,3 +705,13 @@ rule calculate_coverage_thresholds:
                 | datamash -H mean 5-14 \
                 | awk -v c=500 'NR!=1 {{ for (i = 1; i <= NF; ++i) $i /= c; print }}' >> {output}) > {log} 2>&1
         """
+
+
+rule whatshap_compare:
+    input:
+        bench = whatshap_bench_vcf,
+        vcf = rules.whatshap_bcftools_concat_round2.output,
+    output: "conditions/{condition}/whatshap/phase.eval.tsv"
+    log: "conditions/{condition}/logs/whatshap_compare.log"
+    conda: "envs/whatshap.yaml"
+    shell: "(whatshap compare --names benchmark,whatshap --ignore-sample-name --tsv-pairwise {output} {input.bench} {input.vcf}) > {log} 2>&1"

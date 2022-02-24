@@ -31,4 +31,4 @@ snakemake --reason \
                 --cpus-per-task={threads} \
                 --output=cluster_logs/slurm-%x-%j-%N {resources.extra} " \
     --default-resources partition='compute' tmpdir=system_tmpdir threads=1 "extra=''" \
-    --snakefile workflow/hg002QC.smk
+    --snakefile workflow/hg002QC.smk "$@"

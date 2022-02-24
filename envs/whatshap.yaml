@@ -3,5 +3,5 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - whatshap==1.0-0
+  - whatshap==1.2.1
   - python=3
