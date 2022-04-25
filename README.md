@@ -4,7 +4,7 @@
 
 Resources and data specified within snakefile (`hg002QC.smk`) for simplicity. Tested with snakemake v6.15.3.
 
-**Warning: Several steps of this workflow require minimum coverage. It's recommended that this workflow not be run when yield in base pairs is insufficient to produceat least 15X coverage (i.e. yield/3099922541 >= 15x).**
+**Warning: Several steps of this workflow require minimum coverage. It's recommended that this workflow not be run when yield in base pairs is insufficient to produce at least 15X coverage (i.e. yield/3099922541 >= 15x).**
 
 ```text
 # clone repo
