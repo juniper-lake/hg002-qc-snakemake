@@ -1,8 +1,6 @@
-# HG002 QC Snakemake
+# WGS Benchmark Snakemake
 
 ## To Run
-
-Resources and data specified within snakefile (`hg002QC.smk`) for simplicity. Tested with snakemake v6.15.3.
 
 **Warning: Several steps of this workflow require minimum coverage. It's recommended that this workflow not be run when yield in base pairs is insufficient to produce at least 15X coverage (i.e. yield/3099922541 >= 15x).**
 
@@ -11,19 +9,27 @@ Resources and data specified within snakefile (`hg002QC.smk`) for simplicity. Te
 git clone --recursive https://github.com/PacificBiosciences/pb-human-wgs-workflow-snakemake.git workflow
 
 # make necessary directories
-mkdir cluster_logs
+mkdir cluster_logs resources
+
+# put necessary resources into resources folder (check config file for list of resources)
+
+# update config.yaml as necessary
+nano workflow/config.yaml
+
+# create sample sheet TSV
+nano sample_sheet.tsv
 
 # create conda environment
-conda env create --file workflow/environment.yaml
+conda env create --file workflow/environment.yaml --prefix ./WGSbenchmark_env
 
 # activate conda environment
-conda activate pb-human-wgs-workflow
+conda activate ./WGSbenchmark_env
 
 # submit job
-sbatch workflow/run_hg002QC.sh
+sbatch workflow/run_WGSbenchmark.sh sample_sheet.tsv
 ```
 
-## Plots
+## Plots (NEEDS TO BE UPDATED)
 
 A list of important stats from target files that would be good for plotting.
 

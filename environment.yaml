@@ -1,4 +1,3 @@
-name: pb-human-wgs-workflow
 channels:
 - bioconda
 - conda-forge
@@ -8,3 +7,4 @@ dependencies:
 - lockfile==0.12.2
 - mamba
 - python=3
+- pandas
