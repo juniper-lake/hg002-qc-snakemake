@@ -6,7 +6,7 @@
 
 ```text
 # clone repo
-git clone --recursive https://github.com/PacificBiosciences/pb-human-wgs-workflow-snakemake.git workflow
+git clone --recursive https://github.com/juniper-lake/hg002-qc-snakemake.git workflow
 
 # make necessary directories
 mkdir cluster_logs resources
@@ -24,6 +24,9 @@ conda env create --file workflow/environment.yaml --prefix ./WGSbenchmark_env
 
 # activate conda environment
 conda activate ./WGSbenchmark_env
+
+# dry run
+sbatch workflow/run_WGSbenchmark.sh sample_sheet.tsv -n
 
 # submit job
 sbatch workflow/run_WGSbenchmark.sh sample_sheet.tsv
