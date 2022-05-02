@@ -6,6 +6,7 @@ targets:
   - structural_variants
 
 # reference-based resources
+reference_name: 'GRCh38'
 reference: 'resources/human_GRCh38_no_alt_analysis_set.fasta'
 reference_index: 'resources/human_GRCh38_no_alt_analysis_set.fasta.fai'
 chromosome_lengths: 'resources/human_GRCh38_no_alt_analysis_set.chr_lengths.txt'

@@ -7,9 +7,14 @@
 
 # USAGE: sbatch workflow/process_sample.slurm.sh <sample_id>
 
-WORKFLOWDIR=workflow
+# set variables
 SAMPLE_SHEET=$1
 shift
+WORKFLOWDIR=workflow
+ACCOUNT=100humans
+export TMPDIR=/scratch
+export SINGULARITY_TMPDIR="$TMPDIR"
+export SINGULARITY_BIND="$TMPDIR"
 
 # set umask to avoid locking each other out of directories
 umask 002
@@ -28,8 +33,9 @@ snakemake --config sample_sheet=${SAMPLE_SHEET} \
     --latency-wait 120 \
     --cluster "sbatch \
                 --partition={resources.partition} \
+                --account=$ACCOUNT \
                 --cpus-per-task={threads} \
                 --output=cluster_logs/slurm-%x-%j-%N {resources.extra} " \
-    --default-resources partition='compute' "tmpdir='/scratch'" threads=1 "extra=''" \
+    --default-resources partition='compute' tmpdir=system_tmpdir threads=1 "extra=''" \
     --snakefile ${WORKFLOWDIR}/Snakefile \
     "$@"

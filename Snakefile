@@ -13,6 +13,7 @@ configfile: f"{workflow_dir}/config.yaml"
 sample_sheet = pd.read_csv(config['sample_sheet'], sep='\t', header=0)
 output_dir = config['output_dir']
 workflow_targets = config['targets']
+reference_name = config['reference_name']
 reference = config['reference']
 reference_index = config['reference_index']
 chromosome_lengths = config['chromosome_lengths']
@@ -81,7 +82,7 @@ targets.extend([f"{output_dir}/{condition}/{filename}"
                     for filename in [
                         "smrtcell_stats/all_movies.read_length_and_quality.tsv",
                         "mosdepth/coverage.mosdepth.summary.txt",
-                        "mosdepth/mosdepth.M2_ratio.txt",
+                        "mosdepth/M2_ratio.txt",
                         "mosdepth/gc_coverage.summary.txt",
                         "mosdepth/coverage.thresholds.summary.txt"
                                     ]])
@@ -150,8 +151,8 @@ rule pbmm2_align:
         ref_index = reference_index,
         query = lambda wc: ubam_dict[wc.condition][wc.movie]
     output:
-        bam = f"{output_dir}/{{condition}}/aligned/{{movie}}.aligned.bam",
-        bai = f"{output_dir}/{{condition}}/aligned/{{movie}}.aligned.bam.bai"
+        bam = f"{output_dir}/{{condition}}/aligned/{{movie}}.{reference_name}.bam",
+        bai = f"{output_dir}/{{condition}}/aligned/{{movie}}.{reference_name}.bam.bai"
     log: f"{output_dir}/{{condition}}/logs/pbmm2_align.{{movie}}.log"
     params:
         condition = lambda wc: wc.condition,
@@ -321,7 +322,7 @@ rule truvari_benchmark:
         f"{output_dir}/{{condition}}/truvari/{{version}}/giab_report.txt"
     log: f"{output_dir}/{{condition}}/logs/truvari_benchmark.{{version}}.log"
     params: 
-        prefix = f"{output_dir}/{{condition}}/truvari",
+        prefix = f"{output_dir}/{{condition}}/truvari/{{version}}",
         bed = lambda wc: "--includebed "+truvari_bed_dict[wc.condition][wc.version] if wc.version in truvari_bed_dict[wc.condition].keys() else ""
     conda: "envs/truvari.yaml"
     shell:
@@ -339,8 +340,8 @@ rule truvari_benchmark:
 
 rule deepvariant_make_examples_round1:
     input:
-        bams = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.aligned.bam" for movie in ubam_dict[wc.condition].keys()],
-        bais = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.aligned.bam.bai" for movie in ubam_dict[wc.condition].keys()],
+        bams = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.{reference_name}.bam" for movie in ubam_dict[wc.condition].keys()],
+        bais = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.{reference_name}.bam.bai" for movie in ubam_dict[wc.condition].keys()],
         ref = reference
     output:
         tfrecord = f"{output_dir}/{{condition}}/deepvariant_intermediate/examples/examples.tfrecord-{{shard}}-of-{n_shards:05}.gz"
@@ -350,7 +351,7 @@ rule deepvariant_make_examples_round1:
         vsc_min_fraction_indels = "0.12",
         pileup_image_width = 199,
         shard = lambda wc: wc.shard,
-        reads = lambda wc: ','.join([f"{output_dir}/{wc.condition}/aligned/{movie}.aligned.bam" for movie in ubam_dict[wc.condition].keys()])
+        reads = lambda wc: ','.join([f"{output_dir}/{wc.condition}/aligned/{movie}.{reference_name}.bam" for movie in ubam_dict[wc.condition].keys()])
     resources:
         extra = '--constraint=avx512'
     shell:
@@ -426,8 +427,8 @@ rule whatshap_phase_round1:
         ref = reference,
         vcf = f"{output_dir}/{{condition}}/whatshap_intermediate/{{chromosome}}.deepvariant.vcf.gz",
         tbi = f"{output_dir}/{{condition}}/whatshap_intermediate/{{chromosome}}.deepvariant.vcf.gz.tbi",
-        phaseinput = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.aligned.bam" for movie in ubam_dict[wc.condition].keys()],
-        phaseinputindex = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.aligned.bam.bai" for movie in ubam_dict[wc.condition].keys()],
+        phaseinput = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.{reference_name}.bam" for movie in ubam_dict[wc.condition].keys()],
+        phaseinputindex = lambda wc: [f"{output_dir}/{{condition}}/aligned/{movie}.{reference_name}.bam.bai" for movie in ubam_dict[wc.condition].keys()],
     output: f"{output_dir}/{{condition}}/whatshap_intermediate/{{chromosome}}.deepvariant.phased.vcf.gz"
     log: f"{output_dir}/{{condition}}/logs/whatshap_phase_round1.{{chromosome}}.log"
     params: chromosome = lambda wc: wc.chromosome
@@ -473,9 +474,9 @@ rule whatshap_haplotag_round1:
 
 
 rule samtools_index_bam:
-    input: f"{output_dir}/{{condition}}/{{whatshap_folder}}/{{prefix}}.bam"
-    output: f"{output_dir}/{{condition}}/{{whatshap_folder}}/{{prefix}}.bam.bai"
-    log: f"{output_dir}/{{condition}}/logs/samtools_index_bam/{{whatshap_folder}}/{{prefix}}.log"
+    input: f"{output_dir}/{{condition}}/{{folder}}/{{prefix}}.bam"
+    output: f"{output_dir}/{{condition}}/{{folder}}/{{prefix}}.bam.bai"
+    log: f"{output_dir}/{{condition}}/logs/samtools_index_bam/{{folder}}/{{prefix}}.log"
     threads: 4
     conda: "envs/samtools.yaml"
     shell: "(samtools index -@ 3 {input}) > {log} 2>&1"
@@ -627,8 +628,8 @@ rule whatshap_phase_round2:
         ref = reference,
         vcf = f"{output_dir}/{{condition}}/whatshap/{{chromosome}}.deepvariant.vcf.gz",
         tbi = f"{output_dir}/{{condition}}/whatshap/{{chromosome}}.deepvariant.vcf.gz.tbi",
-        phaseinput = lambda wc: [f"{output_dir}/{wc.condition}/aligned/{movie}.aligned.bam" for movie in ubam_dict[wc.condition].keys()],
-        phaseinputindex = lambda wc: [f"{output_dir}/{wc.condition}/aligned/{movie}.aligned.bam.bai" for movie in ubam_dict[wc.condition].keys()]
+        phaseinput = lambda wc: [f"{output_dir}/{wc.condition}/aligned/{movie}.{reference_name}.bam" for movie in ubam_dict[wc.condition].keys()],
+        phaseinputindex = lambda wc: [f"{output_dir}/{wc.condition}/aligned/{movie}.{reference_name}.bam.bai" for movie in ubam_dict[wc.condition].keys()]
     output: f"{output_dir}/{{condition}}/whatshap/{{chromosome}}.deepvariant.phased.vcf.gz"
     log: f"{output_dir}/{{condition}}/logs/whatshap_phase_round2.{{chromosome}}.log"
     params: chromosome = lambda wc: wc.chromosome, extra = "--indels"
@@ -731,7 +732,7 @@ rule mosdepth:
 
 rule calculate_m2_ratio:
     input: rules.mosdepth.output.summary
-    output: f"{output_dir}/{{condition}}/mosdepth/mosdepth.M2_ratio.txt"
+    output: f"{output_dir}/{{condition}}/mosdepth/M2_ratio.txt"
     log: f"{output_dir}/{{condition}}/logs/calculate_M2_ratio.log"
     conda: "envs/pandas.yaml"
     shell: f"(python3 {workflow_dir}/scripts/calculate_M2_ratio.py {{input}} > {{output}}) > {{log}} 2>&1"
