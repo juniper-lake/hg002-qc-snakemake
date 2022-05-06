@@ -48,7 +48,7 @@ for index, row in sample_sheet.iterrows():
         for item in row['truvari_vcf'].split(','):
             truvari_vcf_dict[row['condition_name']][item.split(':')[0]] = item.split(':')[1]
             # truvari targets
-            targets.append("/".join([output_dir,row['condition_name'],"truvari", item.split(':')[0],"summary.txt"]))
+            targets.append(f"{output_dir}/{row['condition_name']}/truvari/{item.split(':')[0]}/summary.txt")
     if pd.notnull(row['truvari_bed']):
         for item in row['truvari_bed'].split(','):
             truvari_bed_dict[row['condition_name']][item.split(':')[0]] = item.split(':')[1]
@@ -57,7 +57,7 @@ for index, row in sample_sheet.iterrows():
         for item in row['happy_vcf'].split(','):
             happy_vcf_dict[row['condition_name']][item.split(':')[0]] = item.split(':')[1]
             # happy targets
-            targets.append("/".join([output_dir,row['condition_name'],"happy", item.split(':')[0]+".summary.csv"]))
+            targets.append(f"{output_dir}/{row['condition_name']}/happy/{item.split(':')[0]}.summary.csv")
     if pd.notnull(row['happy_bed']):
         for item in row['happy_bed'].split(','):
             happy_bed_dict[row['condition_name']][item.split(':')[0]] = item.split(':')[1]
@@ -66,15 +66,16 @@ for index, row in sample_sheet.iterrows():
         for item in row['whatshap_vcf'].split(','):
             whatshap_vcf_dict[row['condition_name']][item.split(':')[0]] = item.split(':')[1]
             # whatshap targets
-            targets.append("/".join([output_dir,row['condition_name'],"whatshap", item.split(':')[0]+".phase.eval.tsv"]))
+            targets.append(f"{output_dir}/{row['condition_name']}/whatshap/{item.split(':')[0]}.phase.eval.tsv")
     # short-read yak db
     if pd.notnull(row['sr_yak']):
         for item in row['sr_yak'].split(','):
             sr_yak_dict[row['condition_name']][item.split(':')[0]] = item.split(':')[1]
             # yak qv targets
-            targets.append("/".join([output_dir,row['condition_name'],"hifiasm", item.split(':')[0]+".asm.p_ctg.qv.txt"]))
-            targets.append("/".join([output_dir,row['condition_name'],"hifiasm", item.split(':')[0]+".asm.a_ctg.qv.txt"]))
+            targets.append(f"{output_dir}/{row['condition_name']}/hifiasm/{item.split(':')[0]}.asm.p_ctg.qv.txt")
+            targets.append(f"{output_dir}/{row['condition_name']}/hifiasm/{item.split(':')[0]}.asm.a_ctg.qv.txt")
 
+print(targets)
 
 # targets that don't depend on resources
 targets.extend([f"{output_dir}/{condition}/{filename}"
