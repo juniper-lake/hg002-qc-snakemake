@@ -328,7 +328,7 @@ rule truvari_benchmark:
     conda: "envs/truvari.yaml"
     shell:
         """
-        (rmdir {params.prefix} && \
+        (rm -rf {params.prefix} && \
         truvari \
             -f {input.ref} \
             -b {input.bench_vcf} {params.bed} \
