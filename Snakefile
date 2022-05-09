@@ -75,7 +75,6 @@ for index, row in sample_sheet.iterrows():
             targets.append(f"{output_dir}/{row['condition_name']}/hifiasm/{item.split(':')[0]}.asm.p_ctg.qv.txt")
             targets.append(f"{output_dir}/{row['condition_name']}/hifiasm/{item.split(':')[0]}.asm.a_ctg.qv.txt")
 
-print(targets)
 
 # targets that don't depend on resources
 targets.extend([f"{output_dir}/{condition}/{filename}"
@@ -320,7 +319,6 @@ rule truvari_benchmark:
         f"{output_dir}/{{condition}}/truvari/{{version}}/call-filter.vcf",
         f"{output_dir}/{{condition}}/truvari/{{version}}/summary.txt",
         f"{output_dir}/{{condition}}/truvari/{{version}}/log.txt",
-        f"{output_dir}/{{condition}}/truvari/{{version}}/giab_report.txt"
     log: f"{output_dir}/{{condition}}/logs/truvari_benchmark.{{version}}.log"
     params: 
         prefix = f"{output_dir}/{{condition}}/truvari/{{version}}",
@@ -328,12 +326,12 @@ rule truvari_benchmark:
     conda: "envs/truvari.yaml"
     shell:
         """
-        (rm -rf {params.prefix} && \
+        (rmdir {params.prefix} && \
         truvari \
             -f {input.ref} \
             -b {input.bench_vcf} {params.bed} \
             -o {params.prefix} \
-            --passonly --giabreport \
+            --passonly \
             -r 1000 -p 0.00 \
             -c {input.query_vcf}) > {log} 2>&1
         """
@@ -599,6 +597,7 @@ rule happy_benchmark_deepvariant:
             --threads {threads} \
             -r {input.ref} {params.bed} \
             -o {params.prefix} \
+            --pass-only \
             --engine=vcfeval --engine-vcfeval-template {input.sdf} \
             --stratification {input.strats} \
             {input.bench_vcf} {input.query_vcf}) > {log} 2>&1
@@ -609,7 +608,7 @@ rule deepvariant_bcftools_stats:
     input: rules.deepvariant_postprocess_variants_round2.output.vcf
     output: f"{output_dir}/{{condition}}/deepvariant/deepvariant.vcf.stats.txt"
     log: f"{output_dir}/{{condition}}/logs/deepvariant_bcftools_stats.log"
-    params: f"--fasta-ref {reference} --apply-filters PASS -s {{condition}}"
+    params: f"--fasta-ref {reference} --apply-filters PASS -s HG002"
     threads: 4
     conda: "envs/bcftools.yaml"
     shell: "(bcftools stats --threads 3 {params} {input} > {output}) > {log} 2>&1"
